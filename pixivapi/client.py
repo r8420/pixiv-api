@@ -322,9 +322,9 @@ class Client:
         )
 
         return {
-            "illustrations": [
-                Illustration(**illust, client=self) for illust in response["illusts"]
-            ],
+            "illustrations": {
+                illust['id']: Illustration(**illust, client=self) for illust in response["illusts"]
+            },
             "next": parse_qs(response["next_url"], param="offset"),
         }
 
