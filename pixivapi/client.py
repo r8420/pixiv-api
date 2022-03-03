@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 from json import JSONDecodeError
 
 import cloudscraper
+import requests
 from requests import RequestException
 
 from pixivapi.common import HEADERS, format_bool, parse_qs, require_auth
@@ -16,6 +17,7 @@ from pixivapi.enums import ContentType, RankingMode, SearchTarget, Sort, Visibil
 from pixivapi.errors import BadApiResponse, LoginError
 from pixivapi.models import Account, Comment, FullUser, Illustration, Novel, User
 
+USER_AGENT = "PixivIOSApp/7.13.3 (iOS 14.6; iPhone13,2)"
 AUTH_URL = "https://oauth.secure.pixiv.net/auth/token"
 BASE_URL = "https://app-api.pixiv.net"
 FILTER = "for_ios"
@@ -40,8 +42,8 @@ class Client:
     def __init__(
         self,
         language="English",
-        client_id="KzEZED7aC0vird8jWyHM38mXjNTY",
-        client_secret="W9JZoJe00qPvJsiyCGT3CCtC6ZUtdpKpzMbNlUGP",
+        client_id="MOBrBDS8blbauoSck0ZfDbtuzpyT",
+        client_secret="lsACyCD94FhDUtGTXi3QzcFE2uU1hqtDaKeqrdwj",
     ):
         self.language = language
         self.client_id = client_id
@@ -133,28 +135,20 @@ class Client:
         )
 
     def _make_auth_request(self, data):
-        client_time = (
-            datetime.utcnow()
-            .replace(microsecond=0)
-            .replace(tzinfo=timezone.utc)
-            .isoformat()
-        )
-
         try:
-            response = self.session.post(
-                url=AUTH_URL,
+            response = requests.post(
+                AUTH_URL,
                 data={
                     "client_id": self.client_id,
                     "client_secret": self.client_secret,
-                    "get_secure_url": 1,
+                    "include_policy": "true",
                     **data,
                 },
                 headers={
-                    "X-Client-Time": client_time,
-                    "X-Client-Hash": hashlib.md5(
-                        (client_time + LOGIN_SECRET).encode("utf-8")
-                    ).hexdigest(),
-                },
+                    "user-agent": USER_AGENT,
+                    "app-os-version": "14.6",
+                    "app-os": "ios",
+                }
             )
             json_ = response.json()
 

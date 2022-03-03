@@ -66,6 +66,7 @@ class Account(User):
         is_premium,
         x_restrict,
         is_mail_authorized,
+        require_policy_agreement
     ):
         super().__init__(account, id, name, profile_image_urls)
         self.mail_address = mail_address
@@ -242,6 +243,7 @@ class Illustration:
         x_restrict,
         client=None,
         total_comments=None,
+        comment_access_control=None
     ):
         self.caption = caption
         self.create_date = parse_timestamp(create_date)
